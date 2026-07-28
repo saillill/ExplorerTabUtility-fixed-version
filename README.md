@@ -1,3 +1,12 @@
+# Explorer Tab Utility Fixed Version
+Based on [w4po/ExplorerTabUtility](https://github.com/w4po/ExplorerTabUtility), fixed some issues, added Chinese interface and theme switching.
+### Differences from the Original
+- **Chinese Interface** — All menus, settings, and prompts translated into Chinese, supports switching between Chinese and English
+- **Theme Switching** — Supports dark, light, and system-following modes
+- **Settings Protection** — Fixed configuration file corruption issue, added automatic backup
+
+##
+
 # Explorer Tab Utility 修复版
 
 基于 [w4po/ExplorerTabUtility](https://github.com/w4po/ExplorerTabUtility)，修复了一些问题，添加了中文界面和主题切换。
@@ -7,7 +16,6 @@
 - **中文界面** — 全部菜单、设置、提示翻译为中文，支持中英切换
 - **主题切换** — 支持深色、浅色、跟随系统
 - **设置保护** — 修复配置文件损坏问题，加入自动备份
-- **仅 .NET 9.0** — 不再支持 .NET Framework 4.8.1
 
 ---
 

@@ -25,7 +25,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        framework: [ 'net9.0-windows' ]
+        framework: [ 'net9.0-windows', 'net481' ]
         arch: [ 'x64', 'x86', 'arm64' ]
       fail-fast: true
       max-parallel: 6

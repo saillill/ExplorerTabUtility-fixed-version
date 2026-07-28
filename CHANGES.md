@@ -22,5 +22,6 @@
 
 ## 变更
 
-- 仅支持 .NET 9.0（移除 .NET Framework 4.8.1 支持）
-- 移除自动更新功能（通过 GitHub Releases 手动更新）
+- 构建方式：恢复 MSBuild 构建，支持 .NET 9.0 和 .NET Framework 4.8.1 双框架
+- COM 互操作：恢复系统 COMReference 方式
+- 移除手动 COM 类型定义（已不需要）

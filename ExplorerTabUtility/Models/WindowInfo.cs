@@ -10,6 +10,4 @@ public class WindowInfo
     public string? Name { get; set; }
     public DWebBrowserEvents2_OnQuitEventHandler? OnQuitHandler { get; set; }
     public DWebBrowserEvents2_NavigateComplete2EventHandler? OnNavigateHandler { get; set; }
-    public ExplorerTabUtility.Interop.ComEventSink? OnQuitSink { get; set; }
-    public ExplorerTabUtility.Interop.ComEventSink? NavigateCompleteSink { get; set; }
 }

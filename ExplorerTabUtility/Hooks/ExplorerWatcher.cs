@@ -410,6 +410,10 @@ public class ExplorerWatcher : IHook
             else
                 PreventWindowHiding(hWnd);
 
+            // Remove this location from closed list (race condition fix: OnQuit may add it async)
+            lock (_closedWindowsLock)
+                _closedWindows.RemoveAll(w => string.Equals(w.Location, location, StringComparison.OrdinalIgnoreCase));
+
             // Check if it is a detached tab
             var isRecentlyClosed = TryGetRecentlyClosedWindow(location, out var closedWindow);
             if (isRecentlyClosed)
@@ -424,6 +428,8 @@ public class ExplorerWatcher : IHook
                 _ = OpenTabNavigateWithSelection(new WindowRecord(location, hWnd, GetSelectedItems(window)), _mainWindowHandle);
 
                 window.Quit();
+                lock (_closedWindowsLock)
+                    _closedWindows.RemoveAll(w => string.Equals(w.Location, location, StringComparison.OrdinalIgnoreCase));
                 RemoveWindowAndUnhookEvents(window, windowInfo);
                 return;
             }

@@ -80,7 +80,7 @@ public partial class HotKeyProfileControl : UserControl
     public void RefreshLocalization()
     {
         // Rebuild scope ComboBox with current language
-        CbScope.ItemsSource = Enum.GetValues<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
+        CbScope.ItemsSource = Enum.GetValues(typeof(HotkeyScope)).Cast<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
         CbScope.SelectedValue = _profile.Scope;
 
         // Rebuild action ComboBox with current language
@@ -104,7 +104,7 @@ public partial class HotKeyProfileControl : UserControl
 
         // Setup ComboBoxes — must set ItemsSource BEFORE SelectedValue to prevent
         // SelectionChanged handlers from reading null SelectedValue and falling back to defaults
-        CbScope.ItemsSource = Enum.GetValues<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
+        CbScope.ItemsSource = Enum.GetValues(typeof(HotkeyScope)).Cast<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
         UpdateActionComboBox();
         CbScope.SelectedValue = _profile.Scope;
         CbAction.SelectedValue = _profile.Action;

@@ -89,20 +89,24 @@ public partial class HotKeyProfileControl : UserControl
         CbAction.SelectedValue = _profile.Action;
     }
 
+    private bool _isInitializing;
+
     // Initialize controls with hot key profile data
     private void InitializeControls()
     {
+        _isInitializing = true;
+
         CbEnabled.IsChecked = _profile.IsEnabled;
         TxtName.Text = _profile.Name ?? string.Empty;
 
         if (_profile.HotKeys != null)
             TxtHotKeys.Text = _profile.HotKeys.HotKeysToString(_profile.IsDoubleClick);
 
-        // Setup ComboBoxes
+        // Setup ComboBoxes — must set ItemsSource BEFORE SelectedValue to prevent
+        // SelectionChanged handlers from reading null SelectedValue and falling back to defaults
         CbScope.ItemsSource = Enum.GetValues<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
-        CbScope.SelectedValue = _profile.Scope;
-
         UpdateActionComboBox();
+        CbScope.SelectedValue = _profile.Scope;
         CbAction.SelectedValue = _profile.Action;
 
         TxtPath.Text = _profile.Path ?? string.Empty;
@@ -111,6 +115,8 @@ public partial class HotKeyProfileControl : UserControl
         CbOpenAsTab.IsChecked = _profile.IsAsTab;
 
         UpdateControlsEnabledState();
+
+        _isInitializing = false;
     }
 
     private void SetupEventHandlers()
@@ -141,11 +147,16 @@ public partial class HotKeyProfileControl : UserControl
 
     private void CbScope_SelectedIndexChanged(object _, SelectionChangedEventArgs __)
     {
+        if (_isInitializing) return;
         _profile.Scope = (HotkeyScope)(CbScope.SelectedValue ?? 0);
         UpdateActionComboBox();
     }
 
-    private void CbAction_SelectedIndexChanged(object _, SelectionChangedEventArgs __) => UpdateAction();
+    private void CbAction_SelectedIndexChanged(object _, SelectionChangedEventArgs __)
+    {
+        if (_isInitializing) return;
+        UpdateAction();
+    }
     private void TxtPath_TextChanged(object _, TextChangedEventArgs __) => _profile.Path = TxtPath.Text;
     private void NDelayValueChanged(object? _, RoutedPropertyChangedEventArgs<double> e) => _profile.Delay = (int)e.NewValue;
     private void CbHandled_CheckedChanged(object _, RoutedEventArgs __) => _profile.IsHandled = CbHandled.IsChecked ?? true;

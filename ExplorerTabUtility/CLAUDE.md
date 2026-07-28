@@ -122,9 +122,8 @@ App.OnStartup()
 ### 2. HotKeyProfileControl 初始化顺序
 **绝对不能**在设 `CbAction.ItemsSource` 之前设 `CbScope.SelectedValue`。
 设 scope 会触发 `SelectionChanged` → `UpdateActionComboBox()`，
-此时若 `CbAction.ItemsSource` 为空，`SelectedValue = null`，
-退化为 `default(HotKeyAction) = Open`，覆盖 `_profile.Action`。
-已通过 `_isInitializing` 守卫标志解决，新代码中修改初始化逻辑时注意。
+此时若 `CbAction.SelectedValue` 为 null，退化为 `default(HotKeyAction) = Open`，
+覆盖 `_profile.Action`。已通过 `_isInitializing` 守卫标志解决。
 
 ### 3. 设置保存的竞态
 `DebounceSave()` 用 500ms 防抖，`ForceSave()` 立即保存。
@@ -133,12 +132,10 @@ App.OnStartup()
 ### 4. COM 事件生命周期
 `ComEventSink.Connect()` 需要 `AllowUnsafeBlocks`。
 必须在使用后调用 `.Dispose()` 取消 COM 事件订阅，否则内存泄漏。
-`ExplorerWatcher.cs` 中通过 `windowInfo.OnQuitSink` 等字段管理。
 
 ### 5. 单实例 Mutex
 `App.OnStartup` 用命名 Mutex 确保单实例。
-主题切换或语言切换不需要重启（实时生效），但如果有需要重启的功能：
-必须先调用 `app.ReleaseMutex()` 再 `Process.Start(exe)`。
+主题切换或语言切换不需要重启（实时生效）。
 
 ## i18n 国际化
 
@@ -170,13 +167,3 @@ CI 工作流 (`.github/workflows/build-release.yml`)：
 - 可选 SignPath 代码签名（需配置 `SIGNPATH_API_TOKEN`）
 - 生成 Inno Setup 安装程序
 - 创建 GitHub Release（draft）
-
-## 项目历史
-
-本分支基于 fork `391f1ac`，仅做了以下最小改动：
-1. 修复 5 处 `BasedOn="{DynamicResource}"` → `StaticResource`（XamlParseException 崩溃）
-2. 修复 1 处 `Binding.Converter="{DynamicResource}"` → `StaticResource`（偏好设置闪退）
-3. 补全 4 条硬编码英文弹窗的中文翻译
-4. 修复配置被初始化顺序悄悄重置的 Bug
-5. 清理重复 using 指令
-6. 版本号 2.5.1

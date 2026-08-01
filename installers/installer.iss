@@ -68,9 +68,7 @@ Name: "startupicon"; Description: "Start with Windows"; GroupDescription: "Windo
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 
 ; .NET 9.0 Framework-dependent packages
-	Source: "{#SourceDir}\{#MyAppName}_{#MyAppVersion}_x86_Net9.0_FrameworkDependent.zip"; DestDir: "{app}"; Flags: ignoreversion; Check: IsX86
-	Source: "{#SourceDir}\{#MyAppName}_{#MyAppVersion}_x64_Net9.0_FrameworkDependent.zip"; DestDir: "{app}"; Flags: ignoreversion; Check: IsX64
-	Source: "{#SourceDir}\{#MyAppName}_{#MyAppVersion}_arm64_Net9.0_FrameworkDependent.zip"; DestDir: "{app}"; Flags: ignoreversion; Check: IsArm64
+	Source: "{#SourceDir}\{#MyAppName}_{#MyAppVersion}_Portable_x64.zip"; DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 ; Create app directory with uninstall flag to ensure it's removed on uninstall

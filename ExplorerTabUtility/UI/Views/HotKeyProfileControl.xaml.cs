@@ -79,14 +79,25 @@ public partial class HotKeyProfileControl : UserControl
 
     public void RefreshLocalization()
     {
-        // Rebuild scope ComboBox with current language
-        CbScope.ItemsSource = Enum.GetValues(typeof(HotkeyScope)).Cast<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
-        CbScope.SelectedValue = _profile.Scope;
+        // Must suppress event handlers during the rebuild: replacing ItemsSource clears the
+        // selection and raises SelectionChanged with a null SelectedValue, which would
+        // silently overwrite _profile.Scope/_profile.Action (and rename the profile).
+        _isInitializing = true;
+        try
+        {
+            // Rebuild scope ComboBox with current language
+            CbScope.ItemsSource = Enum.GetValues(typeof(HotkeyScope)).Cast<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
+            CbScope.SelectedValue = _profile.Scope;
 
-        // Rebuild action ComboBox with current language
-        var allowedActions = GetAllowedActions(_profile.Scope);
-        CbAction.ItemsSource = allowedActions.Select(a => new DisplayItem<HotKeyAction>(GetActionDisplay(a), a)).ToArray();
-        CbAction.SelectedValue = _profile.Action;
+            // Rebuild action ComboBox with current language
+            var allowedActions = GetAllowedActions(_profile.Scope);
+            CbAction.ItemsSource = allowedActions.Select(a => new DisplayItem<HotKeyAction>(GetActionDisplay(a), a)).ToArray();
+            CbAction.SelectedValue = _profile.Action;
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
     }
 
     private bool _isInitializing;
@@ -102,7 +113,7 @@ public partial class HotKeyProfileControl : UserControl
         if (_profile.HotKeys != null)
             TxtHotKeys.Text = _profile.HotKeys.HotKeysToString(_profile.IsDoubleClick);
 
-        // Setup ComboBoxes — must set ItemsSource BEFORE SelectedValue to prevent
+        // Setup ComboBoxes - must set ItemsSource BEFORE SelectedValue to prevent
         // SelectionChanged handlers from reading null SelectedValue and falling back to defaults
         CbScope.ItemsSource = Enum.GetValues(typeof(HotkeyScope)).Cast<HotkeyScope>().Select(s => new DisplayItem<HotkeyScope>(GetScopeDisplay(s), s)).ToArray();
         UpdateActionComboBox();
@@ -147,14 +158,16 @@ public partial class HotKeyProfileControl : UserControl
 
     private void CbScope_SelectedIndexChanged(object _, SelectionChangedEventArgs __)
     {
-        if (_isInitializing) return;
-        _profile.Scope = (HotkeyScope)(CbScope.SelectedValue ?? 0);
+        // Ignore selection-cleared events (ItemsSource replacement): SelectedValue is null
+        // and treating it as a user choice would corrupt the profile.
+        if (_isInitializing || CbScope.SelectedValue is not HotkeyScope scope) return;
+        _profile.Scope = scope;
         UpdateActionComboBox();
     }
-
     private void CbAction_SelectedIndexChanged(object _, SelectionChangedEventArgs __)
     {
-        if (_isInitializing) return;
+        // Same as CbScope: a null SelectedValue is a transient selection clear, not a choice.
+        if (_isInitializing || CbAction.SelectedValue == null) return;
         UpdateAction();
     }
     private void TxtPath_TextChanged(object _, TextChangedEventArgs __) => _profile.Path = TxtPath.Text;

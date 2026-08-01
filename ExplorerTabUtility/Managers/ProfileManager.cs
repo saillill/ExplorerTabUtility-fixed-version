@@ -47,7 +47,26 @@ public class ProfileManager
         }
         catch
         {
-            // Invalid JSON or deserialization error
+            // Invalid JSON: fall back to the default profiles so a later save
+            // does not silently wipe the user hotkey list.
+            try
+            {
+                var defaults = JsonSerializer.Deserialize<List<HotKeyProfile>>(Constants.DefaultHotKeyProfiles);
+                if (defaults != null)
+                {
+                    _savedProfiles.Clear();
+                    _savedProfiles.AddRange(defaults);
+                    _tempProfiles.Clear();
+                    foreach (var p in _savedProfiles)
+                    {
+                        _tempProfiles.Add(p.Clone());
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore - defaults are static and should always parse.
+            }
         }
     }
 

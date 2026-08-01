@@ -35,6 +35,15 @@ public static class SettingsManager
 
         if (!File.Exists(SettingsFilePath))
         {
+            // Recover from backup if the main file is missing (e.g., interrupted write),
+            // otherwise the user would silently lose all settings.
+            if (File.Exists(BackupFilePath) && TryLoad(BackupFilePath, out var missingBackup))
+            {
+                Settings = missingBackup;
+                WasRecoveredFromBackup = true;
+                try { WriteAtomic(SettingsFilePath, missingBackup); } catch { }
+                return;
+            }
             Settings = new AppSettings();
             return;
         }
@@ -130,18 +139,28 @@ public static class SettingsManager
         var bak = path + ".bak";
         var json = JsonSerializer.Serialize(s);
         File.WriteAllText(tmp, json);
-        // backup
+
         if (File.Exists(path))
         {
-            try { File.Copy(path, bak, overwrite: true); } catch { }
+            // File.Replace is atomic on NTFS: tmp becomes the settings file and the old
+            // file is moved to bak. If it fails, fall back to copy + delete + move.
+            try
+            {
+                File.Replace(tmp, path, bak);
+                return;
+            }
+            catch
+            {
+                try { File.Copy(path, bak, overwrite: true); } catch { }
+            }
         }
-        // atomic replace
+
         try { File.Delete(path); } catch (FileNotFoundException) { }
         File.Move(tmp, path);
         try { if (File.Exists(tmp)) File.Delete(tmp); } catch { }
     }
-}
 
+}
 internal class AppSettings
 {
     public bool MouseHook { get; set; }

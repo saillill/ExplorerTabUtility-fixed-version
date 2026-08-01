@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Windows.Controls;
 using System.Collections.Generic;
 using ExplorerTabUtility.Models;
+using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.UI.Views;
 
 namespace ExplorerTabUtility.Managers;
